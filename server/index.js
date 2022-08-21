@@ -9,30 +9,31 @@ const PORT = 4000;
 
 http.Server(app);
 
-import socketIO from 'socket.io';
+import { Server } from "socket.io";
 
-socketIO(http, {
+const io = new Server(http, {
     cors: {
         origin: "http://localhost:3000"
     }
+
 });
 
 //Add this before the app.get() block
-socketIO.on('connection', (socket) => {
+io.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
     socket.on('disconnect', () => {
-      console.log('🔥: A user disconnected');
+        console.log('🔥: A user disconnected');
     });
 });
 
 app.use(cors());
 
 app.get('/api', (req, res) => {
-  res.json({
-    message: 'Hello world',
-  });
+    res.json({
+        message: 'Hello world',
+    });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
+    console.log(`Server listening on ${PORT}`);
 });
