@@ -18,6 +18,15 @@ const ChatPage = ({ socket }) => {
     });
   }, [socket, messages]);
 
+  /** Fetching the messages from the API route*/
+  useEffect(() => {
+    fetch("http://localhost:4000/api")
+      .then(response => response.json())
+      .then(data => setMessages(data.messages))
+
+  }, [])
+
+
   useEffect(() => {
     socket.on('typingResponse', (data) => setTypingStatus(data));
   }, [socket]);

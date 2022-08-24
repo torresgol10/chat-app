@@ -1,6 +1,9 @@
 const express = require('express');
 const app = express();
 const PORT = 4000;
+const fs = require('fs');
+const rawData = fs.readFileSync('messages.json');
+const messagesData = JSON.parse(rawData);
 
 //New imports
 const http = require('http').Server(app);
@@ -16,7 +19,13 @@ let users = [];
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
     socket.on('message', (data) => {
-        socketIO.emit('messageResponse', data);
+        messagesData["messages"].push(data)
+        const stringData = JSON.stringify(messagesData, null, 2)
+        fs.writeFile("messages.json", stringData, (err) => {
+            console.error(err)
+        })
+
+        socketIO.emit("messageResponse", data)
     });
 
     socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data));
@@ -46,9 +55,7 @@ socketIO.on('connection', (socket) => {
 app.use(cors());
 
 app.get('/api', (req, res) => {
-    res.json({
-        message: 'Hello world',
-    });
+    res.json(messagesData);
 });
 
 http.listen(PORT, () => {
